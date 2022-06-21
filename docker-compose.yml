@@ -1,0 +1,34 @@
+version: '3'
+
+networks:
+  netproject:
+    driver: bridge
+
+services:
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysqlcontainer
+    restart: always
+    networks:
+      - netproject
+    ports:
+      - "3306:3306"
+    volumes:
+      - .docker/dbdata:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=projectdocker
+      - MYSQL_TCP_PORT=3306
+
+  nginx:
+    image: nginx:latest
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - 80:80
+    networks:
+      - netproject
+    volumes:
+      - ./:/usr/share/nginx
+    depends_on:
+      - mysqldb
